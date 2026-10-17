@@ -1,0 +1,12 @@
+{
+  "name": "cs408-lab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "计算机408交互可视化实验室",
+  "scripts": {
+    "test": "node tests/verify.cjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
