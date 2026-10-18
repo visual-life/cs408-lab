@@ -22,5 +22,14 @@ eq(last('tcp',{x:4294967295,y:4294967295}).nextX,0);
 const floyd=Array.from({length:6},(_,i)=>Array.from({length:6},(_,j)=>i===j?0:1e6));for(const [a,b,w]of EDGES)floyd[a][b]=floyd[b][a]=w;for(let k=0;k<6;k++)for(let i=0;i<6;i++)for(let j=0;j<6;j++)floyd[i][j]=Math.min(floyd[i][j],floyd[i][k]+floyd[k][j]);
 for(let i=0;i<6;i++){eq(last('dijkstra',{start:String.fromCharCode(65+i)}).dist,floyd[i]);eq(last('bfs',{start:String.fromCharCode(65+i)}).done.length,6);}
 for(const [id,v] of [['quick',{data:'1,NaN'}],['quick',{data:'1'}],['seq',{data:'1',pos:0,value:1,op:'delete'}],['rr',{data:'1,0',quantum:2}],['stack',{data:'1',count:2}],['pipeline',{count:9}],['tcp',{x:-1,y:0}],['lru',{data:'-1',frames:3}]]){assert.throws(()=>buildSteps(id,v));assertions++;}
-console.log(`PASS: ${assertions} checks; all 12 lessons, 304 quicksort inputs, sequence positions, graph all-pairs oracle, edge cases and code-line mappings.`);
+// A number's visual identity must follow the same item through every swap,
+// even when different items have equal values. Backward playback reuses these snapshots.
+for(const data of [[3,1,2],[5,5,1,5],[-2,0,-2,4],[4,3,2,1]]){
+ const snapshots=buildSteps('quick',{data:data.join(',')});
+ for(const s of snapshots){eq([...s.ids].sort((a,b)=>a-b),data.map((_,i)=>i));eq(s.ids.map(id=>data[id]),s.a);}
+ const initial=[...snapshots[0].ids];snapshots.at(-1).ids[0]=-1;eq(snapshots[0].ids,initial);
+}
+eq(last('seq',{data:'1,2,3,4,5,6,7,8,9,10,11,12',op:'delete',pos:12,value:''}).a.length,11);
+assert.throws(()=>buildSteps('seq',{data:'1,2,3,4,5,6,7,8,9,10,11,12',op:'insert',pos:1,value:8}));assertions++;
+console.log(`PASS: ${assertions} checks; all 12 lessons, 304 quicksort inputs, stable motion identities, sequence positions, graph all-pairs oracle, edge cases and code-line mappings.`);
 

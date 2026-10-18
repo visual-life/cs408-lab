@@ -7,17 +7,17 @@ function buildSteps(id,values){
  const out=[];
  const add=(title,description,state={},vars={},line=1)=>{out.push(JSON.parse(JSON.stringify({title,description,vars,line,...state})));};
  if(id==='quick'){
-  const a=numbers(values.data,2,12),done=[];
-  const shot=(title,desc,active=[],pivot=-1,lo=0,hi=a.length-1,vars={},line=1)=>add(title,desc,{kind:'bars',a,active,pivot,done,lo,hi},vars,line);
+  const a=numbers(values.data,2,12),done=[],ids=a.map((_,i)=>i);
+  const shot=(title,desc,active=[],pivot=-1,lo=0,hi=a.length-1,vars={},line=1)=>add(title,desc,{kind:'bars',a,ids,active,pivot,done,lo,hi},vars,line);
   shot('准备划分','从整个数组开始，先选择当前区间的最后一个元素为基准。',[],-1,0,a.length-1,{'区间':`[0, ${a.length-1}]`},15);
   function sort(lo,hi){if(lo>hi)return;if(lo===hi){done.push(lo);shot('单元素区间','只有一个元素的区间天然有序。',[],-1,lo,hi,{},16);return;}let i=lo-1,pivot=a[hi];
    shot('选定基准',`选取 A[${hi}] = ${pivot} 为 pivot。紫色表示基准元素。`,[],hi,lo,hi,{lo,hi,i,pivot},5);
    for(let j=lo;j<hi;j++){
     shot('比较当前元素',`比较 A[${j}] = ${a[j]} 与 pivot = ${pivot}。`,[j],hi,lo,hi,{i,j,pivot},7);
-    if(a[j]<pivot){i++;[a[i],a[j]]=[a[j],a[i]];shot(i===j?'扩展较小区域':'交换到左侧',i===j?`元素已在正确一侧，i 增加到 ${i}。`:`交换 A[${i}] 和 A[${j}]，使 [${lo}, ${i}] 都小于基准。`,[i,j],hi,lo,hi,{i,j,pivot},9);}
+    if(a[j]<pivot){i++;[a[i],a[j]]=[a[j],a[i]];[ids[i],ids[j]]=[ids[j],ids[i]];shot(i===j?'扩展较小区域':'交换到左侧',i===j?`元素已在正确一侧，i 增加到 ${i}。`:`交换 A[${i}] 和 A[${j}]，使 [${lo}, ${i}] 都小于基准。`,[i,j],hi,lo,hi,{i,j,pivot},9);}
     else shot('保留在右侧',`${a[j]} 不小于 ${pivot}，i 保持不变，继续扫描。`,[j],hi,lo,hi,{i,j,pivot},7);
    }
-   const p=i+1;[a[p],a[hi]]=[a[hi],a[p]];done.push(p);shot('基准归位',`基准 ${pivot} 位于下标 ${p}，这一位置已经最终确定。`,[p],-1,lo,hi,{p,pivot},12);
+   const p=i+1;[a[p],a[hi]]=[a[hi],a[p]];[ids[p],ids[hi]]=[ids[hi],ids[p]];done.push(p);shot('基准归位',`基准 ${pivot} 位于下标 ${p}，这一位置已经最终确定。`,[p],-1,lo,hi,{p,pivot},12);
    sort(lo,p-1);sort(p+1,hi);
   }sort(0,a.length-1);shot('排序完成','所有基准和子区间都已确定，数组已按升序排列。',[],-1,0,a.length-1,{'元素数':a.length},20);
  }
